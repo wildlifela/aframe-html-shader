@@ -48,7 +48,7 @@ AFRAME.registerShader('html', {
     width: { default: null },
     height: { default: null },
     ratio: { default: null },
-    updateDelay: { default: 5000 },
+    updateDelay: { default: 0 },
 
   },
 
