@@ -5,7 +5,7 @@
  */
 
 
-import html2canvas from './lib/html2canvas/core'
+import html2canvas from 'html2canvas'
 
 if (typeof AFRAME === 'undefined') {
   throw 'Component attempted to register before AFRAME was available.'
@@ -49,6 +49,7 @@ AFRAME.registerShader('html', {
     height: { default: null },
     ratio: { default: null },
     updateDelay: { default: 0 },
+    canvasScale: { default: 1 },
 
   },
 
@@ -65,6 +66,7 @@ AFRAME.registerShader('html', {
     this.__ctx = this.__cnv.getContext('2d')
     this.__texture = new THREE.Texture(this.__cnv)
     this.__reset()
+    this.__scale = data.canvasScale
     this.material = new THREE.MeshBasicMaterial({ map: this.__texture })
     this.el.sceneEl.addBehavior(this)
     return this.material
@@ -364,6 +366,7 @@ AFRAME.registerShader('html', {
     const ratio = canvas.width / canvas.height
     const cnvW = this.__cnv.width = THREE.Math.nearestPowerOfTwo(canvas.width)
     const cnvH = this.__cnv.height = THREE.Math.nearestPowerOfTwo(canvas.height)
+
     this.__ctx.drawImage(canvas, 0, 0, cnvW, cnvH)
     this.__texture.needsUpdate = true
     if (this.__ratio) {
@@ -394,12 +397,15 @@ AFRAME.registerShader('html', {
     this.__nextTime = null
     if (!this.__targetEl) { return }
     const { width, height } = this.__targetEl.getBoundingClientRect()
+
     html2canvas(this.__targetEl, {
-      background: undefined,
+      logging: false,
+      backgroundColor: null,
       width: this.__width || width,
       height: this.__height || height,
-      onrendered: this.__draw.bind(this)
-    })
+      removeContainer: false,
+      scale: this.__scale,
+    }).then(this.__draw.bind(this))
   },
 
   /**
