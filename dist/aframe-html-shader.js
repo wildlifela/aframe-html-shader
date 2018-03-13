@@ -99,7 +99,8 @@
 	    width: { default: null },
 	    height: { default: null },
 	    ratio: { default: null },
-	    updateDelay: { default: 0 }
+	    updateDelay: { default: 0 },
+	    canvasScale: { default: 1 }
 
 	  },
 
@@ -114,6 +115,7 @@
 	    this.__cnv.width = 2;
 	    this.__cnv.height = 2;
 	    this.__ctx = this.__cnv.getContext('2d');
+	    this.__scale = data.canvasScale;
 	    this.__texture = new THREE.Texture(this.__cnv);
 	    this.__reset();
 	    this.material = new THREE.MeshBasicMaterial({ map: this.__texture });
@@ -478,6 +480,7 @@
 	      background: undefined,
 	      width: this.__width || width,
 	      height: this.__height || height,
+	      scale: this.__scale,
 	      onrendered: this.__draw.bind(this)
 	    });
 	  },
@@ -568,11 +571,12 @@
 	    options.imageTimeout = typeof options.imageTimeout === "undefined" ? 10000 : options.imageTimeout;
 	    options.renderer = typeof options.renderer === "function" ? options.renderer : CanvasRenderer;
 	    options.strict = !!options.strict;
+	    options.scale = typeof options.scale === "undefined" ? 1 : options.scale;
 
 	    var width = options.width || 512;
 	    var height = options.height || 512;
 
-	    return renderNode(nodeList, width, height).then(function (canvas) {
+	    return renderNode(nodeList, width, height, options).then(function (canvas) {
 	        options.onrendered(canvas);
 	    });
 	}
@@ -609,17 +613,19 @@
 	    });
 	}
 
-	function renderNode(node, width, height) {
+	function renderNode(node, width, height, options) {
 	    var support = new Support(node.ownerDocument);
 	    var imageLoader = new ImageLoader({
 	        useCORS: true
 	    }, support);
-	    var options = {
-	        renderer: html2canvas.CanvasRenderer
+	    var _options = {
+	        renderer: html2canvas.CanvasRenderer,
+	        scale: options.scale
 	    };
+
 	    var bounds = getBounds(node);
-	    var renderer = new options.renderer(width, height, imageLoader, options, document);
-	    var parser = new NodeParser(node, renderer, support, imageLoader, options);
+	    var renderer = new _options.renderer(width, height, imageLoader, _options, document);
+	    var parser = new NodeParser(node, renderer, support, imageLoader, _options);
 	    return parser.ready.then(function () {
 	        return renderer.canvas;
 	    });
@@ -765,16 +771,18 @@
 
 	function CanvasRenderer(width, height) {
 	    Renderer.apply(this, arguments);
+
 	    this.canvas = this.options.canvas || this.document.createElement("canvas");
 	    if (!this.options.canvas) {
-	        this.canvas.width = width;
-	        this.canvas.height = height;
+	        this.canvas.width = width * this.options.scale;
+	        this.canvas.height = height * this.options.scale;
 	    }
 	    this.ctx = this.canvas.getContext("2d");
+	    this.ctx.scale(this.options.scale, this.options.scale);
 	    this.taintCtx = this.document.createElement("canvas").getContext("2d");
 	    this.ctx.textBaseline = "bottom";
 	    this.variables = {};
-	    log("Initialized CanvasRenderer with size", width, "x", height);
+	    log("Initialized CanvasRenderer with size", width, "x", height, " with scale " * this.options.scale);
 	}
 
 	CanvasRenderer.prototype = Object.create(Renderer.prototype);

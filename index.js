@@ -49,6 +49,7 @@ AFRAME.registerShader('html', {
     height: { default: null },
     ratio: { default: null },
     updateDelay: { default: 0 },
+    canvasScale: { default: 1 },
 
   },
 
@@ -63,6 +64,7 @@ AFRAME.registerShader('html', {
     this.__cnv.width = 2
     this.__cnv.height = 2
     this.__ctx = this.__cnv.getContext('2d')
+    this.__scale = data.canvasScale
     this.__texture = new THREE.Texture(this.__cnv)
     this.__reset()
     this.material = new THREE.MeshBasicMaterial({ map: this.__texture })
@@ -398,6 +400,7 @@ AFRAME.registerShader('html', {
       background: undefined,
       width: this.__width || width,
       height: this.__height || height,
+      scale: this.__scale,
       onrendered: this.__draw.bind(this)
     })
   },
