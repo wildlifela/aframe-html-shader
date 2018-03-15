@@ -492,10 +492,10 @@
 	      height: this.__height || height,
 	      scale: this.__scale,
 	      logging: this.__logging,
-	      canvasOffsetX: this.__canvasOffsetX,
-	      canvasOffsetY: this.__canvasOffsetY,
-	      fixedX: this.__fixedX,
-	      fixedY: this.__fixedY,
+	      canvasOffsetX: this.__canvasOffsetX, //Offset X when drawing Canvas
+	      canvasOffsetY: this.__canvasOffsetY, //Offset Y when drawing Canvas
+	      fixedX: this.__fixedX, //Sets node to X regardless of bounds value, overrides canvasOffsetX
+	      fixedY: this.__fixedY, //Sets node to Y regardless of bounds value, overrides canvasOffsetY
 	      onrendered: this.__draw.bind(this)
 	    });
 	  },
@@ -638,7 +638,6 @@
 
 	    var bounds = getBounds(node);
 
-	    console.log(options.fixedY, options.canvasOffsetY);
 	    var _options = {
 	        renderer: html2canvas.CanvasRenderer,
 	        scale: options.scale,
@@ -1770,14 +1769,7 @@
 	    if (node.getBoundingClientRect) {
 	        var clientRect = node.getBoundingClientRect();
 	        var width = node.offsetWidth == null ? clientRect.width : node.offsetWidth;
-	        console.log({
-	            top: clientRect.top,
-	            bottom: clientRect.bottom || clientRect.top + clientRect.height,
-	            right: clientRect.left + width,
-	            left: clientRect.left,
-	            width: width,
-	            height: node.offsetHeight == null ? clientRect.height : node.offsetHeight
-	        });
+
 	        return {
 	            top: clientRect.top,
 	            bottom: clientRect.bottom || clientRect.top + clientRect.height,
@@ -1792,14 +1784,7 @@
 
 	exports.offsetBounds = function (node) {
 	    var parent = node.offsetParent ? exports.offsetBounds(node.offsetParent) : { top: 0, left: 0 };
-	    console.log({
-	        top: node.offsetTop + parent.top,
-	        bottom: node.offsetTop + node.offsetHeight + parent.top,
-	        right: node.offsetLeft + parent.left + node.offsetWidth,
-	        left: node.offsetLeft + parent.left,
-	        width: node.offsetWidth,
-	        height: node.offsetHeight
-	    });
+
 	    return {
 	        top: node.offsetTop + parent.top,
 	        bottom: node.offsetTop + node.offsetHeight + parent.top,

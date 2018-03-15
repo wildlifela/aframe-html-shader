@@ -412,10 +412,10 @@ AFRAME.registerShader('html', {
       height: this.__height || height,
       scale: this.__scale,
       logging: this.__logging,
-      canvasOffsetX: this.__canvasOffsetX,
-      canvasOffsetY: this.__canvasOffsetY,
-      fixedX: this.__fixedX,
-      fixedY: this.__fixedY,
+      canvasOffsetX: this.__canvasOffsetX, //Offset X when drawing Canvas
+      canvasOffsetY: this.__canvasOffsetY, //Offset Y when drawing Canvas
+      fixedX: this.__fixedX, //Sets node to X regardless of bounds value, overrides canvasOffsetX
+      fixedY: this.__fixedY, //Sets node to Y regardless of bounds value, overrides canvasOffsetY
       onrendered: this.__draw.bind(this)
     })
   },
