@@ -103,6 +103,8 @@
 	    canvasScale: { default: 1 },
 	    canvasOffsetX: { default: 0 },
 	    canvasOffsetY: { default: 0 },
+	    fixedX: { default: null },
+	    fixedY: { default: null },
 	    logging: { default: false }
 
 	  },
@@ -121,6 +123,8 @@
 	    this.__scale = data.canvasScale;
 	    this.__canvasOffsetX = data.canvasOffsetX;
 	    this.__canvasOffsetY = data.canvasOffsetY;
+	    this.__fixedX = data.fixedX;
+	    this.__fixedY = data.fixedY;
 	    this.__logging = data.logging;
 	    this.__texture = new THREE.Texture(this.__cnv);
 	    this.__reset();
@@ -490,6 +494,8 @@
 	      logging: this.__logging,
 	      canvasOffsetX: this.__canvasOffsetX,
 	      canvasOffsetY: this.__canvasOffsetY,
+	      fixedX: this.__fixedX,
+	      fixedY: this.__fixedY,
 	      onrendered: this.__draw.bind(this)
 	    });
 	  },
@@ -629,14 +635,17 @@
 	    var imageLoader = new ImageLoader({
 	        useCORS: true
 	    }, support);
+
+	    var bounds = getBounds(node);
+
+	    console.log(options.fixedY, options.canvasOffsetY);
 	    var _options = {
 	        renderer: html2canvas.CanvasRenderer,
 	        scale: options.scale,
-	        canvasOffsetX: options.canvasOffsetX,
-	        canvasOffsetY: options.canvasOffsetY
+	        canvasOffsetX: typeof options.fixedX === 'number' ? options.fixedX - bounds.left : options.canvasOffsetX,
+	        canvasOffsetY: typeof options.fixedY === 'number' ? options.fixedY - bounds.top : options.canvasOffsetY
 	    };
 
-	    var bounds = getBounds(node);
 	    var renderer = new _options.renderer(width, height, imageLoader, _options, document);
 	    var parser = new NodeParser(node, renderer, support, imageLoader, _options);
 	    return parser.ready.then(function () {

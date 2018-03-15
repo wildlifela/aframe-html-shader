@@ -52,6 +52,8 @@ AFRAME.registerShader('html', {
     canvasScale: { default: 1 },
     canvasOffsetX: { default: 0 },
     canvasOffsetY: { default: 0 },
+    fixedX: { default: null },
+    fixedY: { default: null },
     logging: { default: false },
 
   },
@@ -70,6 +72,8 @@ AFRAME.registerShader('html', {
     this.__scale = data.canvasScale
     this.__canvasOffsetX = data.canvasOffsetX
     this.__canvasOffsetY = data.canvasOffsetY
+    this.__fixedX = data.fixedX
+    this.__fixedY = data.fixedY
     this.__logging = data.logging
     this.__texture = new THREE.Texture(this.__cnv)
     this.__reset()
@@ -410,6 +414,8 @@ AFRAME.registerShader('html', {
       logging: this.__logging,
       canvasOffsetX: this.__canvasOffsetX,
       canvasOffsetY: this.__canvasOffsetY,
+      fixedX: this.__fixedX,
+      fixedY: this.__fixedY,
       onrendered: this.__draw.bind(this)
     })
   },
