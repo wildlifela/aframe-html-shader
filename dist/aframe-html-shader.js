@@ -100,7 +100,12 @@
 	    height: { default: null },
 	    ratio: { default: null },
 	    updateDelay: { default: 0 },
-	    canvasScale: { default: 1 }
+	    canvasScale: { default: 1 },
+	    canvasOffsetX: { default: 0 },
+	    canvasOffsetY: { default: 0 },
+	    fixedX: { default: null },
+	    fixedY: { default: null },
+	    logging: { default: false }
 
 	  },
 
@@ -116,6 +121,11 @@
 	    this.__cnv.height = 2;
 	    this.__ctx = this.__cnv.getContext('2d');
 	    this.__scale = data.canvasScale;
+	    this.__canvasOffsetX = data.canvasOffsetX;
+	    this.__canvasOffsetY = data.canvasOffsetY;
+	    this.__fixedX = data.fixedX;
+	    this.__fixedY = data.fixedY;
+	    this.__logging = data.logging;
 	    this.__texture = new THREE.Texture(this.__cnv);
 	    this.__reset();
 	    this.material = new THREE.MeshBasicMaterial({ map: this.__texture });
@@ -481,6 +491,11 @@
 	      width: this.__width || width,
 	      height: this.__height || height,
 	      scale: this.__scale,
+	      logging: this.__logging,
+	      canvasOffsetX: this.__canvasOffsetX, //Offset X when drawing Canvas
+	      canvasOffsetY: this.__canvasOffsetY, //Offset Y when drawing Canvas
+	      fixedX: this.__fixedX, //Sets node to X regardless of bounds value, overrides canvasOffsetX
+	      fixedY: this.__fixedY, //Sets node to Y regardless of bounds value, overrides canvasOffsetY
 	      onrendered: this.__draw.bind(this)
 	    });
 	  },
@@ -572,6 +587,8 @@
 	    options.renderer = typeof options.renderer === "function" ? options.renderer : CanvasRenderer;
 	    options.strict = !!options.strict;
 	    options.scale = typeof options.scale === "undefined" ? 1 : options.scale;
+	    options.canvasOffsetX = typeof options.canvasOffsetX === "undefined" ? 0 : options.canvasOffsetX;
+	    options.canvasOffsetY = typeof options.canvasOffsetY === "undefined" ? 0 : options.canvasOffsetY;
 
 	    var width = options.width || 512;
 	    var height = options.height || 512;
@@ -618,12 +635,16 @@
 	    var imageLoader = new ImageLoader({
 	        useCORS: true
 	    }, support);
-	    var _options = {
-	        renderer: html2canvas.CanvasRenderer,
-	        scale: options.scale
-	    };
 
 	    var bounds = getBounds(node);
+
+	    var _options = {
+	        renderer: html2canvas.CanvasRenderer,
+	        scale: options.scale,
+	        canvasOffsetX: typeof options.fixedX === 'number' ? options.fixedX - bounds.left : options.canvasOffsetX,
+	        canvasOffsetY: typeof options.fixedY === 'number' ? options.fixedY - bounds.top : options.canvasOffsetY
+	    };
+
 	    var renderer = new _options.renderer(width, height, imageLoader, _options, document);
 	    var parser = new NodeParser(node, renderer, support, imageLoader, _options);
 	    return parser.ready.then(function () {
@@ -779,10 +800,13 @@
 	    }
 	    this.ctx = this.canvas.getContext("2d");
 	    this.ctx.scale(this.options.scale, this.options.scale);
+	    this.ctx.translate(this.options.canvasOffsetX, this.options.canvasOffsetY);
 	    this.taintCtx = this.document.createElement("canvas").getContext("2d");
 	    this.ctx.textBaseline = "bottom";
 	    this.variables = {};
-	    log("Initialized CanvasRenderer with size", width, "x", height, " with scale " * this.options.scale);
+	    log("Initialized CanvasRenderer with size", width, "x", height);
+	    log("-- with scale ", this.options.scale);
+	    log("-- with offset", this.options.canvasOffsetX, ',', this.options.canvasOffsetY);
 	}
 
 	CanvasRenderer.prototype = Object.create(Renderer.prototype);
@@ -1745,6 +1769,7 @@
 	    if (node.getBoundingClientRect) {
 	        var clientRect = node.getBoundingClientRect();
 	        var width = node.offsetWidth == null ? clientRect.width : node.offsetWidth;
+
 	        return {
 	            top: clientRect.top,
 	            bottom: clientRect.bottom || clientRect.top + clientRect.height,

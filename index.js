@@ -50,6 +50,11 @@ AFRAME.registerShader('html', {
     ratio: { default: null },
     updateDelay: { default: 0 },
     canvasScale: { default: 1 },
+    canvasOffsetX: { default: 0 },
+    canvasOffsetY: { default: 0 },
+    fixedX: { default: null },
+    fixedY: { default: null },
+    logging: { default: false },
 
   },
 
@@ -65,6 +70,11 @@ AFRAME.registerShader('html', {
     this.__cnv.height = 2
     this.__ctx = this.__cnv.getContext('2d')
     this.__scale = data.canvasScale
+    this.__canvasOffsetX = data.canvasOffsetX
+    this.__canvasOffsetY = data.canvasOffsetY
+    this.__fixedX = data.fixedX
+    this.__fixedY = data.fixedY
+    this.__logging = data.logging
     this.__texture = new THREE.Texture(this.__cnv)
     this.__reset()
     this.material = new THREE.MeshBasicMaterial({ map: this.__texture })
@@ -401,6 +411,11 @@ AFRAME.registerShader('html', {
       width: this.__width || width,
       height: this.__height || height,
       scale: this.__scale,
+      logging: this.__logging,
+      canvasOffsetX: this.__canvasOffsetX, //Offset X when drawing Canvas
+      canvasOffsetY: this.__canvasOffsetY, //Offset Y when drawing Canvas
+      fixedX: this.__fixedX, //Sets node to X regardless of bounds value, overrides canvasOffsetX
+      fixedY: this.__fixedY, //Sets node to Y regardless of bounds value, overrides canvasOffsetY
       onrendered: this.__draw.bind(this)
     })
   },
