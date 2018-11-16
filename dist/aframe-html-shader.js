@@ -441,7 +441,7 @@
 	   */
 	  __draw: function __draw(canvas) {
 	    log('__draw');
-	    if (!this.__ctx || !this.__texture) {
+	    if (!this.__ctx || !this.__texture || !this.el) {
 	      return;
 	    }
 	    var ratio = canvas.width / canvas.height;
