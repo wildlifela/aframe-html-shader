@@ -372,7 +372,7 @@ AFRAME.registerShader('html', {
    */
   __draw (canvas) {
     log('__draw')
-    if (!this.__ctx || !this.__texture) { return }
+    if (!this.__ctx || !this.__texture || !this.el) { return }
     const ratio = canvas.width / canvas.height
     const cnvW = this.__cnv.width = THREE.Math.floorPowerOfTwo(canvas.width)
     const cnvH = this.__cnv.height = THREE.Math.floorPowerOfTwo(canvas.height)
