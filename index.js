@@ -372,7 +372,7 @@ AFRAME.registerShader('html', {
    */
   __draw (canvas) {
     log('__draw')
-    if (!this.__ctx || !this.__texture || !this.el) { return }
+    if (!this.__ctx || !this.__texture) { return }
     const ratio = canvas.width / canvas.height
     const cnvW = this.__cnv.width = THREE.Math.floorPowerOfTwo(canvas.width)
     const cnvH = this.__cnv.height = THREE.Math.floorPowerOfTwo(canvas.height)
@@ -380,6 +380,7 @@ AFRAME.registerShader('html', {
     this.__texture.needsUpdate = true
     if (this.__ratio) {
       /* change size */
+        if (!this.el.getObject3D('mesh').geometry.metadata) { return } //Fix when fps used and el no longer exist
       const { width, height } = this.el.getObject3D('mesh').geometry.metadata.parameters
       this.el.setAttribute('geometry', Object.assign({}, this.el.getAttribute('geometry'), {
         width: (this.__ratio === 'width')? width : height * ratio,
