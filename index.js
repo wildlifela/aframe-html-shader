@@ -380,7 +380,6 @@ AFRAME.registerShader('html', {
     this.__texture.needsUpdate = true
     if (this.__ratio) {
       /* change size */
-        console.log('test')
       if (!this.el.getObject3D('mesh').geometry.metadata) { return } //Fix when fps used and el no longer exist
       const { width, height } = this.el.getObject3D('mesh').geometry.metadata.parameters
       this.el.setAttribute('geometry', Object.assign({}, this.el.getAttribute('geometry'), {
