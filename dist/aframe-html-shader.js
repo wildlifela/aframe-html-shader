@@ -451,6 +451,9 @@
 	    this.__texture.needsUpdate = true;
 	    if (this.__ratio) {
 	      /* change size */
+	      if (!this.el.getObject3D('mesh').geometry.metadata) {
+	        return;
+	      } //Fix when fps used and el no longer exist
 	      var _el$getObject3D$geome = this.el.getObject3D('mesh').geometry.metadata.parameters,
 	          width = _el$getObject3D$geome.width,
 	          height = _el$getObject3D$geome.height;
